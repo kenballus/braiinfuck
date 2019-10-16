@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <malloc.h>
 #include <stdio.h>
+#include <wiiuse/wpad.h>
 
 const int ARRAY_SIZE = 30000;
 
@@ -56,7 +57,28 @@ void interpret(char ifile[]) {
 
         // Input
         case ',':
-            array[index] = getchar();
+            // array[index] = getchar();
+            printf("\nSelect a character:  ");
+            int input_char = 32; // space character
+            while (1) {
+                WPAD_ScanPads();
+                u16 buttons_down = WPAD_ButtonsDown(0);
+                if (buttons_down & WPAD_BUTTON_RIGHT) {
+                    input_char++;
+                    if (input_char == 127) input_char = 32;
+                    printf("\b%c", input_char);
+                }
+                else if (buttons_down & WPAD_BUTTON_LEFT) {
+                    input_char++;
+                    if (input_char == 31) input_char = 126;
+                    printf("\b%c", input_char);
+                }
+                else if (buttons_down & WPAD_BUTTON_HOME) {
+                    printf("\n");
+                    array[index] = input_char;
+                    break;
+                }
+            }
             break;
 
         // Begin loop
