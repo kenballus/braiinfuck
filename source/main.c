@@ -1,7 +1,16 @@
+/*
+Copyright  (C) 1993 Urban Müller
+Copyright? (C) 2019 Ben Kallus
+Braiinfuck!
+
+I, Ben Kallus, permit you to do whatever you want with this software.
+I am not responsible for what you do with this software; you are.
+There is no warranty at all.
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <malloc.h>
 #include <ogcsys.h>
 #include <gccore.h>
 #include <wiiuse/wpad.h>
@@ -10,7 +19,7 @@
 static u32 *xfb;
 static GXRModeObj *rmode;
 
-const uint MAX_INPUT_SIZE = 100000;
+const int MAX_INPUT_SIZE = 100000;
 
 void init() {
     VIDEO_Init();
@@ -38,24 +47,23 @@ int main() {
     init();
  
     printf("\x1b[0;0H"); // Start at Row;Col
-    printf("BraiinFuck\nCopyright (c) 2019 Ben Kallus\n");
+    printf("Braiinfuck!\nCopyright (c) 2019 Ben Kallus\n");
 
     char input[MAX_INPUT_SIZE];
-    uint i;
-    for (i = 0; i < MAX_INPUT_SIZE; i++) {
+    for (int i = 0; i < MAX_INPUT_SIZE; i++) {
         input[i] = 0;
     }
-    uint input_index = 0; // The index of the location one after the most recently-typed character
+    int input_index = 0; // The index of the location one after the most recently-typed character
 
     while (1) {
         WPAD_ScanPads();
 
         u16 buttons_down = WPAD_ButtonsDown(0);
-        if (buttons_down & WPAD_BUTTON_A) {
+        if (buttons_down & WPAD_BUTTON_1) {
             printf("[");
             input[input_index++] = '[';
         }
-        else if (buttons_down & WPAD_BUTTON_B) {
+        else if (buttons_down & WPAD_BUTTON_2) {
             printf("]");
             input[input_index++] = ']';
         }
@@ -67,11 +75,11 @@ int main() {
             printf("-");
             input[input_index++] = '-';
         }
-        else if (buttons_down & WPAD_BUTTON_2) {
+        else if (buttons_down & WPAD_BUTTON_A) {
             printf(".");
             input[input_index++] = '.';
         }
-        // else if (buttons_down & WPAD_BUTTON_1) {
+        // else if (buttons_down & WPAD_BUTTON_B) {
         //     printf(",");
         //     input[input_index++] = ',';
         // }
@@ -83,26 +91,26 @@ int main() {
             printf(">");
             input[input_index++] = '>';
         }
-        else if (buttons_down & WPAD_BUTTON_LEFT) {
+
+        else if (buttons_down & WPAD_BUTTON_B) {
             if (input_index > 0) {
-                if (input_index % 80 == 0) { // Backspacing a line (DOESN'T WORK)
-                    printf("\x1b[%i;79H", (input_index / 80) + 1);
+                if (input_index % 80 == 0) {
+                    printf("\x1b[1A\x1b[79C \x1b[1A\x1b[79C");
                 }
-                printf("\b \b");
+                else{
+                    printf("\b \b");
+                }
                 input[input_index--] = 0;
             }
         }
-
         else if (buttons_down & WPAD_BUTTON_HOME) {
-            printf("\n");
             input[input_index] = 0; // Just to be SUPER sure it's null-terminated
             interpret(input);
-            for (i = 0; i < input_index; i++) {
+            for (int i = 0; i < input_index; i++) {
                 input[i] = 0;
             }
             input_index = 0;
         }
-
     }
  
     return 0;
