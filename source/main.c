@@ -45,27 +45,21 @@ void init() {
 int main() {
     init();
  
-    printf("\x1b[0;0H"); // Start at Row;Col
-    printf("Braiinfuck!\nCopyright? (C) 2019 Ben Kallus\n");
+    printf("\x1b[1;0H"); // Start at Row;Col
+    printf("braiinfuck\n(C) 2019 Ben Kallus\n");
 
     char input[MAX_INPUT_SIZE];
-    for (int i = 0; i < MAX_INPUT_SIZE; i++) {
-        input[i] = 0;
-    }
-
-    // char prev_input[MAX_INPUT_SIZE];
-    // for (int i = 0; i < MAX_INPUT_SIZE; i++) {
-    //     prev_input[i] = 0;
-    // }
 
     int input_index = 0; // The index of the location one after the most recently-typed character
-    // int prev_input_index = -1;
 
     while (1) {
         WPAD_ScanPads();
-
         u16 buttons_down = WPAD_ButtonsDown(0);
-        if (buttons_down & WPAD_BUTTON_LEFT) {
+
+        if (buttons_down & WPAD_BUTTON_HOME && buttons_down & WPAD_BUTTON_B) {
+            break;
+        }
+        else if (buttons_down & WPAD_BUTTON_LEFT) {
             printf(",");
             input[input_index++] = ',';
         }
@@ -97,19 +91,6 @@ int main() {
             printf(">");
             input[input_index++] = '>';
         }
-
-        // else if (buttons_down & WPAD_BUTTON_RIGHT) {
-        //     char* temp = input;
-        //     input = prev_input;
-        //     prev_input = temp;
-        //     for (int i = 0; i < input_index; i++) {
-        //         backspace();
-        //     }
-        //     int temp2 = input_index;
-        //     input_index = prev_input_index;
-        //     prev_input_index = temp2;
-        // }
-
         else if (buttons_down & WPAD_BUTTON_B) {
             if (input_index > 0) {
                 if (input_index % 80 == 0) {
@@ -123,15 +104,14 @@ int main() {
         }
         else if (buttons_down & WPAD_BUTTON_HOME) {
             input[input_index] = 0; // Just to be SUPER sure it's null-terminated
+            printf("\n");
             interpret(input);
-            for (int i = 0; i <= input_index; i++) { // <= because we want the null terminator
-                // prev_input[i] = input[i];
+            for (int i = 0; i <= input_index; i++) { // we use <= because we want the null terminator
                 input[i] = 0;
             }
-            // prev_input_index = input_index;
             input_index = 0;
         }
     }
- 
-    return 0;
+
+    exit(0);
 }
