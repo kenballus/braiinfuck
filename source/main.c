@@ -1,13 +1,3 @@
-/*
-Copyright  (C) 1993 Urban Müller
-Copyright? (C) 2019 Ben Kallus
-Braiinfuck!
-
-I, Ben Kallus, permit you to do whatever you want with this software.
-I am not responsible for what you do with this software; you are.
-There is no warranty at all.
-*/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -19,7 +9,7 @@ There is no warranty at all.
 static u32 *xfb;
 static GXRModeObj *rmode;
 
-const int MAX_INPUT_SIZE = 100000;
+const int MAX_INPUT_SIZE = 10;
 
 void init() {
     VIDEO_Init();
@@ -42,7 +32,7 @@ void init() {
     if (rmode->viTVMode&VI_NON_INTERLACE) VIDEO_WaitVSync();
 }
 
-int main() {
+int main(int argc, char** argv) {
     init();
  
     printf("\x1b[1;0H"); // Start at Row;Col
@@ -58,6 +48,20 @@ int main() {
 
         if (buttons_down & WPAD_BUTTON_HOME && buttons_down & WPAD_BUTTON_B) {
             break;
+        }
+        else if (buttons_down & WPAD_BUTTON_B) {
+            if (input_index > 0) {
+                if (input_index % 80 == 0) {
+                    printf("\x1b[1A\x1b[79C \x1b[1A\x1b[79C");
+                }
+                else {
+                    printf("\b \b");
+                }
+                input[input_index--] = 0;
+            }
+        }
+        else if (input_index >= MAX_INPUT_SIZE) {
+            continue;
         }
         else if (buttons_down & WPAD_BUTTON_LEFT) {
             printf(",");
@@ -90,17 +94,6 @@ int main() {
         else if (buttons_down & WPAD_BUTTON_DOWN) {
             printf(">");
             input[input_index++] = '>';
-        }
-        else if (buttons_down & WPAD_BUTTON_B) {
-            if (input_index > 0) {
-                if (input_index % 80 == 0) {
-                    printf("\x1b[1A\x1b[79C \x1b[1A\x1b[79C");
-                }
-                else {
-                    printf("\b \b");
-                }
-                input[input_index--] = 0;
-            }
         }
         else if (buttons_down & WPAD_BUTTON_HOME) {
             input[input_index] = 0; // Just to be SUPER sure it's null-terminated
